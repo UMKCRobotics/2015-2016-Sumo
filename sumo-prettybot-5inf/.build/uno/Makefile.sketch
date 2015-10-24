@@ -1,0 +1,14 @@
+
+
+
+
+
+.build/uno/src/bot2-pretty-5inf.cpp : src/bot2-pretty-5inf.ino
+	@mkdir -p .build/uno/src
+	@echo [93msrc/bot2-pretty-5inf.ino[0m
+	@/usr/local/bin/ino preproc  -o $@ $^
+
+
+all : .build/uno/src/bot2-pretty-5inf.cpp
+	@true
+

@@ -1,0 +1,21 @@
+###########
+#DATA TYPES
+###########
+
+SumoSense	KEYWORD1
+
+##########
+#FUNCTIONS
+##########
+
+SumoSense	KEYWORD2
+addSensor	KEYWORD2
+returnWhere	KEYWORD2
+returnIfAny	KEYWORD2
+
+##########
+#CONSTANTS
+##########
+
+ABOVE	LITERAL1
+BELOW	LITERAL1
