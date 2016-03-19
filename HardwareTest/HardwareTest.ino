@@ -5,12 +5,14 @@ const char MotorL2 = 11;
 const char MotorR1 = 9;
 const char MotorR2 = 8;
 
-// Analog Inputs
+// Analog Distance Sensors
 const char DistFL = 2;
 const char DistF = 1;
 const char DistFR = 0;
 const char DistL = 3;
 const char DistR = 7;
+
+// Digital Line Sensors
 const char LineBR = 3;
 const char LineBL = 2;
 const char LineFR = 5;
@@ -51,7 +53,9 @@ void loop()
 //  Serial.print(analogRead(DistFR));
 //  Serial.print("\t\t");
 //  Serial.println(analogRead(DistR));
-qtrline.read(sensor_values);
+
+  qtrline.read(sensor_values);
+  
   Serial.println("FLeft         FRight");
   Serial.print(sensor_values[3]);
   Serial.print("\t\t");
