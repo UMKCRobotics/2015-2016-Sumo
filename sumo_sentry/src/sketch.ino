@@ -51,7 +51,7 @@ int mode_count;
 int attack_speed = 255;
 int normal_speed = 200;
 
-bool stop = false;
+bool was_left = false;
 
 
 void setup() 
@@ -137,7 +137,7 @@ void loop()
     //do what mode requires
     if (mode == 0) //sees nothing
     {
-        motors.move(attack_speed,-attack_speed);
+        motors.move(attack_speed,-attack_speed/4);
     }
     else if (mode == 1) // target acquired, tactical nuke incoming
     {

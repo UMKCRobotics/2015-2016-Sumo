@@ -147,7 +147,7 @@ void loop()
     //do what mode requires
     if (mode == 0) //sees nothing
     {
-        motors.move(attack_speed,-attack_speed);
+        motors.move(attack_speed,-attack_speed/4);
     }
     else if (mode == 1) // target acquired, tactical nuke incoming
     {
