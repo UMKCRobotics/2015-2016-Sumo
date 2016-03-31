@@ -61,7 +61,8 @@ int mode_count;
 int attack_speed = 255;
 int normal_speed = 200;
 
-bool stop = false;
+bool was_left = false;
+bool just_started = false;
 
 
 void setup() 
@@ -77,6 +78,8 @@ void setup()
     Serial.begin(9600);
     Serial.println("Starting Sumo Reporting...");
     mode = 0;
+    mode_prev = mode;
+    just_started = true;
 }
 
 void loop() 
@@ -106,17 +109,17 @@ void loop()
             if (lineLoc[1] == '1' && lineLoc[2] == '1') //line in back BOTH
             {
                 motors.drive(attack_speed);
-                delay(100);
+                delay(200);
             }
             else if (lineLoc[1] == '1') //line in back LEFT
             {
                 motors.move(attack_speed,normal_speed);
-                delay(100);
+                delay(200);
             }
             else //line in back RIGHT
             {
                 motors.move(normal_speed,attack_speed);
-                delay(100);
+                delay(200);
             }
         }
     }
@@ -147,34 +150,52 @@ void loop()
     //do what mode requires
     if (mode == 0) //sees nothing
     {
-        motors.move(attack_speed,-attack_speed/4);
+        if (just_started)
+        {
+            motors.move(attack_speed,-attack_speed);
+            if (mode_count > 100)
+                just_started = false;
+        }
+        else
+        {
+            if (was_left)
+                motors.move(-attack_speed/4,attack_speed);
+            else if (!was_left)
+                motors.move(attack_speed,-attack_speed/4);
+        }
     }
     else if (mode == 1) // target acquired, tactical nuke incoming
     {
         motors.drive(attack_speed);
     }
     else if (mode == 2) // target spotted in front left
-    {   motors.move(-normal_speed,attack_speed);
-
+    {   
+        was_left = true;
+        motors.move(-normal_speed,attack_speed);
     }
     else if (mode == 3) // target spotted in front right
     {
+        was_left = false;
         motors.move(attack_speed,-normal_speed);
     }
     else if (mode == 4) // target spotted in far left
     {
+        was_left = true;
         motors.move(-attack_speed,attack_speed);
     }
     else if (mode == 5) // target spotted in far right
     {
+        was_left = false;
         motors.move(attack_speed,-attack_speed);
     }
     else if (mode == 6) //target spotted in front left AND front
     {
+        was_left = true;
         motors.move(normal_speed,attack_speed);
     }
     else if (mode == 7) //target spotted in front right AND front
     {
+        was_left = false;
         motors.move(attack_speed,normal_speed);
     }
     else if (mode == 99) // battery low, stop moving!
@@ -186,7 +207,9 @@ void loop()
     if (mode == mode_prev)
         mode_count++;
     else
+        just_started = false;
         mode_count = 0;
+    mode_prev = mode;
 
     //one loop complete, ayyyy
 }
