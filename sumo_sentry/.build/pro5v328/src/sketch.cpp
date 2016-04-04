@@ -33,7 +33,7 @@ const char LineFL = 4;
 // Line Sensors Initialization
 QTRSensorsRC qtrline((unsigned char[]) {LineBR, LineBL, LineFR, LineFL}, 4);
 unsigned int sensor_values[4];
-unsigned int line_trigger = 1000;
+unsigned int line_triggers[4] = {1000,1000,125,125};
 
 // Distance Sensor Initialization
 SumoIR dist;
@@ -217,7 +217,7 @@ void loop()
 bool seesLine()
 {
     readLineSensors();
-    return (sensor_values[3] < 1000 || sensor_values[2] < 1000 || sensor_values[1] < 1000 || sensor_values[0] < 1000);
+    return (sensor_values[3] < line_triggers[3] || sensor_values[2] < line_triggers[2] || sensor_values[1] < line_triggers[1] || sensor_values[0] < line_triggers[0]);
 }
 
 String whereSeesLine()
@@ -226,7 +226,7 @@ String whereSeesLine()
     String triggered = "";
     for (int i = 0; i < 4; i++)
     {
-        if(sensor_values[i] < 1000)
+        if(sensor_values[i] < line_triggers[i])
             triggered += '1';
         else
             triggered += '0';
