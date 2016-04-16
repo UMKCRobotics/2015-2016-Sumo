@@ -30,10 +30,14 @@ const char LineBL = 2;
 const char LineFR = 9;
 const char LineFL = 4;
 
+// Go Button Pin Mode
+const char GoButtonIn = 7;
+const char GoButtonOut = 8;
+
 // Line Sensors Initialization
 QTRSensorsRC qtrline((unsigned char[]) {LineBR, LineBL, LineFR, LineFL}, 4);
 unsigned int sensor_values[4];
-unsigned int line_triggers[4] = {1000,1000,125,125};
+unsigned int line_triggers[4] = {1000,1000,800,800};
 
 // Distance Sensor Initialization
 SumoIR dist;
@@ -69,17 +73,25 @@ void setup()
 {
     motors.brake(); //motors constructor already sets pins to OUTPUT
     
-    dist.addIR(DistL,220); //add all five distance sensors
+    dist.addIR(DistL,250); //add all five distance sensors
     dist.addIR(DistFL,150);
     dist.addIR(DistF,150);
     dist.addIR(DistFR,150);
-    dist.addIR(DistR,220);
+    dist.addIR(DistR,250);
 
     Serial.begin(9600);
     Serial.println("Starting Sumo Reporting...");
     mode = 0;
     mode_prev = mode;
     just_started = true;
+
+    //Go Button Setup
+    pinMode(GoButtonIn, INPUT_PULLUP);
+	pinMode(GoButtonOut, OUTPUT);
+	digitalWrite(GoButtonOut, LOW);
+
+	// Wait until go button is pressed
+	while(digitalRead(GoButtonIn) == HIGH);
 }
 
 void loop() 
@@ -127,17 +139,18 @@ void loop()
     else
     {
         //check for opposing bot
-        String botLoc = dist.getTriggered();
+        String botLoc = "00000";
+        botLoc = dist.getTriggered();
         if (botLoc[0] == '1') //left
             mode = 4;
         else if (botLoc[4] == '1') //right
             mode = 5;
-        else if (botLoc[1] == '1' && botLoc[2] == '1') //front left AND front
-            mode = 6;
+        /*else if (botLoc[1] == '1' && botLoc[2] == '1') //front left AND front
+            mode = 6;*/
         else if (botLoc[1] == '1') //front left
             mode = 2;
-        else if (botLoc[3] == '1' && botLoc[2] == '1') //front right AND front
-            mode = 7;
+        /*else if (botLoc[3] == '1' && botLoc[2] == '1') //front right AND front
+            mode = 7;*/
         else if (botLoc[3] == '1') //front right
             mode = 3;
         else if (botLoc[2] == '1') //front
@@ -160,11 +173,11 @@ void loop()
         {
             if (was_left)
                 motors.move(-attack_speed/4,attack_speed);
-            else if (!was_left)
+            else
                 motors.move(attack_speed,-attack_speed/4);
         }
     }
-    else if (mode == 1) // target acquired, tactical nuke incoming
+    else if (mode == 1) // target acquired
     {
         motors.drive(attack_speed);
     }
@@ -188,7 +201,7 @@ void loop()
         was_left = false;
         motors.move(attack_speed,-attack_speed);
     }
-    else if (mode == 6) //target spotted in front left AND front
+    /*else if (mode == 6) //target spotted in front left AND front
     {
         was_left = true;
         motors.move(normal_speed,attack_speed);
@@ -201,7 +214,7 @@ void loop()
     else if (mode == 99) // battery low, stop moving!
     {
         motors.brake();
-    }
+    }*/
 
     //iterate mode counter if the same mode as before, reset otherwise
     if (mode == mode_prev)
